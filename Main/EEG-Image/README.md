@@ -1,4 +1,4 @@
-# Capstone Project: EEG and Image Generation
+# EEG to Image Generation Pipeline
 
 This repository contains scripts and resources for processing EEG data and generating images using a Generative Adversarial Network (GAN). The project integrates EEG data preprocessing with image generation, designed for analysis and research purposes in neuroscience and machine learning.
 
@@ -24,5 +24,6 @@ To run the notebooks and scripts, you will need the following:
 - Python 3.10+
 - Jupyter Notebook or JupyterLab
 - Required Python libraries 
+
 
 
