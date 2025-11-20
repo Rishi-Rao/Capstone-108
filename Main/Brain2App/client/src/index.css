@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "./styles/theme.css";
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-main);
+    transition: background-color 0.3s, color 0.3s;
+    min-height: 100vh;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  a:hover {
+    color: var(--color-accent);
+  }
+
+  button {
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: var(--color-accent);
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-weight: 600;
+  }
+}
