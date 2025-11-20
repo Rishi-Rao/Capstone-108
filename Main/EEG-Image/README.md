@@ -19,13 +19,10 @@ This Jupyter notebook trains a Generative Adversarial Network (GAN) on the prepr
 ### 5. **match_eeg_system.ipynb**
 This Jupyter notebook is designed to map and correlate electrode positions from different EEG standard systems (e.g., 10/20 system). It helps align and standardize electrode placements for the analysis and comparison of EEG data across different systems.
 
-
-
 ### Requirements
 To run the notebooks and scripts, you will need the following:
 - Python 3.10+
 - Jupyter Notebook or JupyterLab
 - Required Python libraries 
 
-   ```bash
-   git clone <repository_url>
+
