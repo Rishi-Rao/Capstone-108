@@ -84,7 +84,7 @@ const Upload = () => {
     }
 
     try {
-      const res = await fetch("https://unnitrogenised-unrepressible-shila.ngrok-free.dev/predict_text", {
+      const res = await fetch("http://127.0.0.1:8000/predict_text", {
         method: "POST",
         body: formData,
       });
@@ -134,39 +134,6 @@ const Upload = () => {
         </button>
       </div>
 
-      {/* Show generated image */}
-      {generatedImg && (
-        <div
-          style={{
-            marginTop: 32,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <h3>Generated Image</h3>
-          <img
-            src={generatedImg}
-            alt="Generated from EEG or fMRI"
-            style={{
-              width: 256,
-              height: 256,
-              borderRadius: 8,
-              objectFit: "cover", // ensures the image isn’t stretched
-              border: "1px solid #ccc",
-              marginTop: 16,
-            }}
-          />
-          <button
-            style={{ marginLeft: 8 }}
-            onClick={() => { setGeneratedImg(null); setEegTextFile(null); setEeg(null); setFmri(null) ;}}
-            disabled={loadingImage}
-          >
-            {"Clear"}
-          </button>
-        </div>
-      )}
-
       <hr style={{ margin: "32px 0" }} />
 
       <h1>EEG to Text</h1>
@@ -195,7 +162,38 @@ const Upload = () => {
       </div>
 
 
-
+      {/* Show generated image */}
+      {generatedImg && (
+        <div
+          style={{
+            marginTop: 32,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h3>Generated Image</h3>
+          <img
+            src={generatedImg}
+            alt="Generated from EEG or fMRI"
+            style={{
+              width: 256,
+              height: 256, 
+              borderRadius: 8,
+              objectFit: "cover", // ensures the image isn’t stretched
+              border: "1px solid #ccc",
+              marginTop: 16,
+            }}
+          />
+          <button
+            style={{ marginLeft: 8 }}
+            onClick={() => { setGeneratedImg(null) }}
+            disabled={loadingImage}
+          >
+            {"Clear"}
+          </button>
+        </div>
+      )}
 
       {/* Show generated text */}
       {(generatedText || refinedText) && (
@@ -228,7 +226,7 @@ const Upload = () => {
           </div>
           <button
             style={{ marginLeft: 8 }}
-            onClick={() => { setGeneratedImg(null); setEegTextFile(null); setEeg(null); setFmri(null); }}
+            onClick={() => { setGeneratedText(null) }}
             disabled={loadingImage}
           >
             {"Clear"}
