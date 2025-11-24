@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+torch
+numpy
+transformers
+langchain_google_genai
+python-multipart
