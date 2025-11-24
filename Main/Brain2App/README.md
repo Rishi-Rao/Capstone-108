@@ -3,9 +3,11 @@ EEG-fMRI Fullstack App (React + Express with JSON users storage)
 Structure:
 - client/   -> React (Vite) frontend
 - server/   -> Node + Express backend (stores users in JSON file)
+- eeg-image/ -> FastAPI backend for EEG-to-Image
+- eeg-text/  -> FastAPI backend for EEG-to-Text
 
 Quick start (Linux / macOS / WSL / Windows with Node installed):
-1. Open two terminals.
+1. Open three terminals.
 2. Backend:
    cd server
    npm install
@@ -16,9 +18,19 @@ Quick start (Linux / macOS / WSL / Windows with Node installed):
    npm install
    npm run dev
    (frontend runs on http://localhost:5173 by default)
+4. EEG-to-Image Service:
+   cd eeg-image
+   pip install -r requirements.txt
+   uvicorn app:app --host 0.0.0.0 --port 8000
+5. EEG-to-Text Service:
+   cd eeg-text
+   pip install -r requirements.txt
+   python app.py --checkpoint_path <path_to_your_checkpoint> --port 8001
 
 Notes:
 - Signup/login is persisted in server/users.json.
+- The EEG-to-Text service requires a model checkpoint file.
+- The frontend will communicate with the FastAPI services directly.
 - Upload endpoints are stubbed for future EEG/fMRI handling.
 
 To Run eeg-image server:
