@@ -6,18 +6,24 @@ const Upload = () => {
   const [eeg, setEeg] = useState(null);
   const [fmri, setFmri] = useState(null);
   const [generatedImg, setGeneratedImg] = useState(null);
-  const [generatedText, setGeneratedText] = useState(null);
   const [loadingImage, setLoadingImage] = useState(false);
-  const [loadingText, setLoadingText] = useState(false);  
   const [audioSrc, setAudioSrc] = useState(null);
   const [error, setError] = useState(null);
+  const [eegTextFile, setEegTextFile] = useState(null);
+  const [apiKey, setApiKey] = useState("");
+  const [generatedJson, setGeneratedJson] = useState(null);
+  const [loadingJson, setLoadingJson] = useState(false);
+  const [generatedText, setGeneratedText] = useState("");
+  const [refinedText, setRefinedText] = useState("");
+
 
   const handleListen = async () => {
-    // Simple third-party TTS free endpoint 
-    const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodeURIComponent(generatedText)}`;
+    const textToPlay = refinedText || generatedText;
+    if (!textToPlay) return;
+    // Simple third-party TTS free endpoint (no guarantee). For local TTS, you'd call server to generate audio.
+    const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodeURIComponent(textToPlay)}`;
     setAudioSrc(url);
   };
-
 
   //  Send EEG file to FastAPI backend for image generation
   const handleGenerateImage = async () => {
@@ -58,35 +64,44 @@ const Upload = () => {
     }
   };
 
-  // Send EEG file to FastAPI backend for text generation
-  const handleGenerateText = async () => {
-    if (!eeg) {
-      alert("Please upload an EEG CSV file first!");
+  const handleGenerateJson = async () => {
+    if (!eegTextFile) {
+      alert("Please upload an EEG pickle file first!");
       return;
     }
 
-    setLoadingText(true);
+    setLoadingJson(true);
     setError(null);
-    setGeneratedText(null);
+    setGeneratedJson(null);
+    setGeneratedText("");
+    setRefinedText("");
+
 
     const formData = new FormData();
-    formData.append("file", eeg);
+    formData.append("file", eegTextFile);
+    if (apiKey) {
+      formData.append("api_key", apiKey);
+    }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/generate_text", {
+      const res = await fetch("https://unnitrogenised-unrepressible-shila.ngrok-free.dev/predict_text", {
         method: "POST",
         body: formData,
       });
 
       if (!res.ok) throw new Error(`Server error: ${res.statusText}`);
 
-      const text = await res.text();
-      setGeneratedText(text);
+      const json = await res.json();
+      setGeneratedText(json.generated_text);
+      if (json.refined_text) {
+        setRefinedText(json.refined_text);
+      }
+      setGeneratedJson(null); // Clear the raw JSON
     } catch (err) {
       console.error(err);
-      setError("Failed to generate text. Please check the backend server.");
+      setError("Failed to generate JSON. Please check the backend server.");
     } finally {
-      setLoadingText(false);
+      setLoadingJson(false);
     }
   };
 
@@ -94,7 +109,7 @@ const Upload = () => {
     <div style={{ padding: 20 }}>
       <h1>Upload Your Data</h1>
 
-      <h4>Upload your EEG Readings</h4>
+      <h4>Upload your EEG Readings for Image Generation</h4>
       <input
         type="file"
         accept=".csv,.txt,.pth"
@@ -117,13 +132,6 @@ const Upload = () => {
         >
           {loadingImage ? "Generating Image..." : "Generate Image ➡️"}
         </button>
-        <button
-          style={{ marginLeft: 8 }}
-          onClick={handleGenerateText}
-          disabled={loadingText}
-        >
-          {loadingText ? "Generating Text..." : "Generate Text ➡️"}
-        </button>
       </div>
 
       {/* Show generated image */}
@@ -142,7 +150,7 @@ const Upload = () => {
             alt="Generated from EEG or fMRI"
             style={{
               width: 256,
-              height: 256, 
+              height: 256,
               borderRadius: 8,
               objectFit: "cover", // ensures the image isn’t stretched
               border: "1px solid #ccc",
@@ -151,7 +159,7 @@ const Upload = () => {
           />
           <button
             style={{ marginLeft: 8 }}
-            onClick={() => { setGeneratedImg(null) }}
+            onClick={() => { setGeneratedImg(null); setEegTextFile(null); setEeg(null); setFmri(null) ;}}
             disabled={loadingImage}
           >
             {"Clear"}
@@ -159,11 +167,57 @@ const Upload = () => {
         </div>
       )}
 
+      <hr style={{ margin: "32px 0" }} />
+
+      <h1>EEG to Text</h1>
+      <h4>Upload your EEG Readings for Text Generation (.pkl)</h4>
+      <input
+        type="file"
+        accept=".pickle"
+        onChange={(e) => setEegTextFile(e.target.files[0])}
+      />
+
+      <h4 style={{ marginTop: 16 }}>Google API Key (optional)</h4>
+      <input
+        type="text"
+        placeholder="Enter your Google API Key"
+        value={apiKey}
+        onChange={(e) => setApiKey(e.target.value)}
+      />
+
+      <div style={{ marginTop: 24 }}>
+        <button
+          onClick={handleGenerateJson}
+          disabled={loadingJson}
+        >
+          {loadingJson ? "Generating JSON..." : "Generate JSON ➡️"}
+        </button>
+      </div>
+
+
+
+
       {/* Show generated text */}
-      {generatedText && (
-        <div style={{ flex: 1 }}>
-          <h4>Text Generated</h4>
-          <textarea value={generatedText} readOnly rows={10} style={{ width: "100%" }} />
+      {(generatedText || refinedText) && (
+        <div style={{ marginTop: 32 }}>
+          <h3>Generated Text</h3>
+          <div
+            className="card"
+            style={{
+              padding: "16px",
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+            }}
+          >
+            <p>
+              <strong>Generated:</strong> {generatedText}
+            </p>
+            {refinedText && (
+              <p>
+                <strong>Refined:</strong> {refinedText}
+              </p>
+            )}
+          </div>
           <div style={{ marginTop: 8 }}>
             <button onClick={handleListen}>Listen</button>
             {audioSrc && (
@@ -174,7 +228,7 @@ const Upload = () => {
           </div>
           <button
             style={{ marginLeft: 8 }}
-            onClick={() => { setGeneratedText(null) }}
+            onClick={() => { setGeneratedImg(null); setEegTextFile(null); setEeg(null); setFmri(null); }}
             disabled={loadingImage}
           >
             {"Clear"}
