@@ -17,12 +17,14 @@ const Upload = () => {
   const [refinedText, setRefinedText] = useState("");
 
 
-  const handleListen = async () => {
-    const textToPlay = refinedText || generatedText;
-    if (!textToPlay) return;
-    // Simple third-party TTS free endpoint (no guarantee). For local TTS, you'd call server to generate audio.
-    const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodeURIComponent(textToPlay)}`;
-    setAudioSrc(url);
+  const handleListen = () => {
+    const text = refinedText || generatedText;
+    if (!text) return;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = speechSynthesis.getVoices().find(v => v.name === "Google UK English Male");
+
+    speechSynthesis.speak(utterance);
   };
 
   //  Send EEG file to FastAPI backend for image generation
@@ -84,7 +86,7 @@ const Upload = () => {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/predict_text", {
+      const res = await fetch("https://unnitrogenised-unrepressible-shila.ngrok-free.dev/predict_text", {
         method: "POST",
         body: formData,
       });
@@ -134,6 +136,39 @@ const Upload = () => {
         </button>
       </div>
 
+      {/* Show generated image */}
+      {generatedImg && (
+        <div
+          style={{
+            marginTop: 32,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h3>Generated Image</h3>
+          <img
+            src={generatedImg}
+            alt="Generated from EEG or fMRI"
+            style={{
+              width: 256,
+              height: 256,
+              borderRadius: 8,
+              objectFit: "cover", // ensures the image isn’t stretched
+              border: "1px solid #ccc",
+              marginTop: 16,
+            }}
+          />
+          <button
+            style={{ marginLeft: 8 }}
+            onClick={() => { setGeneratedImg(null); setEegTextFile(null); setEeg(null); setFmri(null) ;}}
+            disabled={loadingImage}
+          >
+            {"Clear"}
+          </button>
+        </div>
+      )}
+
       <hr style={{ margin: "32px 0" }} />
 
       <h1>EEG to Text</h1>
@@ -162,38 +197,7 @@ const Upload = () => {
       </div>
 
 
-      {/* Show generated image */}
-      {generatedImg && (
-        <div
-          style={{
-            marginTop: 32,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <h3>Generated Image</h3>
-          <img
-            src={generatedImg}
-            alt="Generated from EEG or fMRI"
-            style={{
-              width: 256,
-              height: 256, 
-              borderRadius: 8,
-              objectFit: "cover", // ensures the image isn’t stretched
-              border: "1px solid #ccc",
-              marginTop: 16,
-            }}
-          />
-          <button
-            style={{ marginLeft: 8 }}
-            onClick={() => { setGeneratedImg(null) }}
-            disabled={loadingImage}
-          >
-            {"Clear"}
-          </button>
-        </div>
-      )}
+
 
       {/* Show generated text */}
       {(generatedText || refinedText) && (
@@ -226,7 +230,7 @@ const Upload = () => {
           </div>
           <button
             style={{ marginLeft: 8 }}
-            onClick={() => { setGeneratedText(null) }}
+            onClick={() => { setGeneratedImg(null); setEegTextFile(null); setEeg(null); setFmri(null); }}
             disabled={loadingImage}
           >
             {"Clear"}

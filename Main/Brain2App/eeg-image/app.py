@@ -93,4 +93,5 @@ async def generate_image_from_file(file: UploadFile = File(...)):
             return FileResponse(tmp.name, media_type="image/png", filename="generated.png")
 
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
