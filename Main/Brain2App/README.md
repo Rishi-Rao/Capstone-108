@@ -22,8 +22,9 @@ Notes:
 - Upload endpoints are stubbed for future EEG/fMRI handling.
 
 To Run eeg-image server:
-1. Open terminal
-2. run the commands
+1. pip install -r requirements.txt
+2. Open terminal
+3. run the commands
 cd eeg-image
 uvicorn app:app --reload 
 (server runs on http://localhost:4000)

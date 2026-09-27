@@ -1,0 +1,10 @@
+matplotlib==3.11.2
+mne==1.13.2
+numpy==2.5.3
+pandas==3.0.6
+Pillow==12.3.0
+scikit_learn==1.9.1
+skimage==0.0
+torch==2.6.0+cu126
+torchvision==0.21.0+cu126
+tqdm==4.66.4
